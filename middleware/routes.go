@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/opinion-trading/helper"
+	"github.com/opinion-trading/services/order"
 	"github.com/opinion-trading/services/trade"
 )
 
@@ -10,6 +11,7 @@ func registerV1Routes(apiRoute fiber.Router) {
 	v1Route := apiRoute.Group("/v1")
 
 	trade.TradRoute(v1Route)
+	order.OrderRoute(v1Route)
 }
 
 func RegisterRoutes(app *fiber.App) {

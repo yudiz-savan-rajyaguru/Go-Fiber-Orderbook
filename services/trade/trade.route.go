@@ -8,6 +8,6 @@ import (
 func TradRoute(route fiber.Router) {
 	routes := route.Group("/trade")
 
-	routes.Post("", h.BodyValidator(&TradeRequestBody{}), BestAvailableMatch)
-	// routes.Put("", h.)
+	routes.Post("", h.BodyValidator(&TradeRequestBody{}), PlaceOrder)
+	routes.Put("", h.BodyValidator(&UpdateTradeRequestBody{}), UpdateOrder)
 }

@@ -4,11 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/opinion-trading/config"
+	"github.com/redis/go-redis/v9"
 )
 
 var ctx = context.Background()
+
 var Rdb *redis.Client
 
 func Connect() {

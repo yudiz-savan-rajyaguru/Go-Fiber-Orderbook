@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/opinion-trading/database"
 	redisClient "github.com/opinion-trading/redis_client"
+	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
 )
 
@@ -17,7 +17,7 @@ var ctx = context.Background()
 func ProcessOrderbookRedisData() error {
 	batchSize := 4
 	redisKey := "orderbook"
-	backUpKey := "orderBookBackUp"
+	backUpKey := "orderbookBackUp"
 
 	list, err := redisClient.Rdb.LRange(ctx, redisKey, 0, int64(batchSize-1)).Result()
 	if err != nil {
@@ -57,7 +57,7 @@ func ProcessOrderbookRedisData() error {
 func ImplementCron() {
 	c := cron.New()
 
-	c.AddFunc("@every 30s", func() {
+	c.AddFunc("@every 10m", func() {
 		err := ProcessOrderbookRedisData()
 		if err != nil {
 			fmt.Printf("Cron Error: %v\n", err)

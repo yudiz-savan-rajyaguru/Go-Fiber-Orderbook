@@ -136,6 +136,13 @@ func Marshal(val interface{}) ([]byte, error) {
 	return jsonData, nil
 }
 
+func Unmarshal(data string, dataStruct interface{}) error {
+	if err := json.Unmarshal([]byte(data), dataStruct); err != nil {
+		return err
+	}
+	return nil
+}
+
 // currently not used
 func Validate(ctx *fiber.Ctx, body interface{}) bool {
 	err := ctx.BodyParser(body)
