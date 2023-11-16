@@ -14,7 +14,7 @@ type configStruct struct {
 	JWT_VALIDITY            int    `envconfig:"default=50"`
 	SQL_MAX_OPEN_CONNECTION int    `envconfig:"default=20"`
 	SQL_MAX_IDLE_CONNECTION int    `envconfig:"default=5"`
-	REDIS_URL               string `envconfig:"default=127.0.0.6379"`
+	REDIS_URL               string `envconfig:"default=127.0.0.1:6379"`
 }
 
 var ConfigEnv configStruct
