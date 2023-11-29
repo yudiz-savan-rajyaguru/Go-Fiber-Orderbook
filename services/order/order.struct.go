@@ -13,9 +13,11 @@ type RequestBody struct {
 	Price        float32               `json:"price" validate:"required,lte=9.5,gte=0.5"`
 	Qty          int16                 `json:"qty" validate:"required,gte=1"`
 	Side         helper.Sides          `json:"side" validate:"required,uppercase"`
-	PurchaseFlag helper.FlagOfPurchase `json:"purchaseFlag" validate:"required,uppercase"`
+	PurchaseType helper.FlagOfPurchase `json:"purchaseType" validate:"required,uppercase"`
+	OrderType    helper.OrderType      `json:"orderType" validate:"required,uppercase"`
 }
 
+// we can not update the price when update the order that's why can't add order type in the update struct
 type UpdateBody struct {
 	OrderId      uuid.UUID             `json:"orderId" validate:"required"`
 	UserId       string                `json:"userId" validate:"required"`
@@ -24,7 +26,7 @@ type UpdateBody struct {
 	PreQty       int16                 `json:"preQty" validate:"required,gte=1"`
 	NewQty       int16                 `json:"newQty" validate:"required,gte=1"`
 	Side         helper.Sides          `json:"side" validate:"required,uppercase"`
-	PurchaseFlag helper.FlagOfPurchase `json:"purchaseFlag" validate:"required,uppercase"`
+	PurchaseType helper.FlagOfPurchase `json:"purchaseType" validate:"required,uppercase"`
 	CreatedAt    int64                 `json:"created_At" validate:"required"`
 }
 
@@ -32,14 +34,15 @@ type PlacedOrder struct {
 	PlacedOrderId uuid.UUID `json:"order_id"`
 	// YesOrderId uuid.UUID `json:"yes_orderId"`
 	// NoOrderId  uuid.UUID `json:"no_orderId"`
-	YesUserId string    `json:"yes_uid"`
-	NoUserId  string    `json:"no_uid"`
-	EventId   string    `json:"eid"`
-	YesPrice  float32   `json:"yes_price"`
-	NoPrice   float32   `json:"no_price"`
-	YesQty    int16     `json:"yes_qty"`
-	NoQty     int16     `json:"no_qty"`
-	CreatedAt time.Time `json:"created_at" default:"time.Now()"`
+	YesUserId string           `json:"yes_uid"`
+	NoUserId  string           `json:"no_uid"`
+	EventId   string           `json:"eid"`
+	YesPrice  float32          `json:"yes_price"`
+	NoPrice   float32          `json:"no_price"`
+	YesQty    int16            `json:"yes_qty"`
+	NoQty     int16            `json:"no_qty"`
+	OrderType helper.OrderType `json:"order_type"` // MKT or LIMIT
+	CreatedAt time.Time        `json:"created_at" default:"time.Now()"`
 }
 
 type Order struct {

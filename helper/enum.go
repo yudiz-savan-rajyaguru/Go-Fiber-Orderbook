@@ -43,3 +43,21 @@ func (s FlagOfPurchase) Valid() string {
 		return "unknown"
 	}
 }
+
+type OrderType string
+
+const (
+	Market OrderType = "MKT"
+	Limit  OrderType = "LIMIT"
+)
+
+func (s OrderType) Valid() string {
+	switch s {
+	case "MKT":
+		return string(Market)
+	case "LIMIT":
+		return string(Limit)
+	default:
+		return "unknown"
+	}
+}

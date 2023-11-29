@@ -22,7 +22,7 @@ func findMatchWithSet(body *RequestBody) (int16, error) {
 		getSide = "YES"
 	}
 
-	redisKey := fmt.Sprintf("%s:bids%s:%g", body.EventId, getSide, getPrice)
+	redisKey := fmt.Sprintf("%s:BUY:%s:%g", body.EventId, getSide, getPrice)
 
 	// find to the opponent list
 	data, err := redisclient.Rdb.ZRangeByScore(ctx, redisKey, &redis.ZRangeBy{
@@ -87,7 +87,8 @@ func MakeOrderWithRedis(c *fiber.Ctx) error {
 	// handle enum
 	m := make(map[string]string)
 	m["side"] = body.Side.Valid()
-	m["purchaseFlag"] = body.PurchaseFlag.Valid()
+	m["purchaseFlag"] = body.PurchaseType.Valid()
+	m["orderType"] = body.OrderType.Valid()
 
 	if err := h.ValidateEnum(m); len(err) != 0 {
 		return h.SendResponse(c, h.Response{
@@ -96,6 +97,16 @@ func MakeOrderWithRedis(c *fiber.Ctx) error {
 			Data:    err,
 		})
 	}
+
+	// if market order then first find the best available price from market
+	// if body.OrderType == "MKT" {
+	// 	// find the best available price
+	// 	if body.Side == "YES" {
+
+	// 	} else if body.Side == "NO" {
+
+	// 	}
+	// }
 
 	// matching the order
 	uuid := uuid.New()
@@ -112,13 +123,13 @@ func MakeOrderWithRedis(c *fiber.Ctx) error {
 	}
 
 	// if not match then add to the set
-	redisKey := fmt.Sprintf("%s:bids%s:%g", body.EventId, body.Side, body.Price)
+	redisKey := fmt.Sprintf("%s:BUY:%s:%g", body.EventId, body.Side, body.Price)
 	var order Order
 	order.ID = uuid
 	order.UserId = body.UserId
 	// order.Qty = body.Qty
 	order.Price = body.Price
-	order.CreatedAt = time.Now().Unix()
+	order.CreatedAt = time.Now().UnixMilli()
 
 	jsonString, _ := h.Marshal(order)
 	_, err = redisclient.Rdb.ZAdd(ctx, redisKey, redis.Z{Member: jsonString, Score: float64(body.Qty)}).Result()
@@ -143,7 +154,7 @@ func UpdateOrderQtyWithRedis(c *fiber.Ctx) error {
 	// handle enum
 	m := make(map[string]string)
 	m["side"] = body.Side.Valid()
-	m["purchaseFlag"] = body.PurchaseFlag.Valid()
+	m["purchaseFlag"] = body.PurchaseType.Valid()
 
 	if err := h.ValidateEnum(m); len(err) != 0 {
 		return h.SendResponse(c, h.Response{
@@ -160,7 +171,7 @@ func UpdateOrderQtyWithRedis(c *fiber.Ctx) error {
 		Price:     body.Price,
 		// Qty: body.PreQty,
 	}
-	redisKey := fmt.Sprintf("%s:bids%s:%g", body.EventId, body.Side, body.Price)
+	redisKey := fmt.Sprintf("%s:BUY:%s:%g", body.EventId, body.Side, body.Price)
 	jsonString, _ := h.Marshal(updateOrder)
 	res, err := redisclient.Rdb.ZAddArgs(ctx, redisKey, redis.ZAddArgs{
 		XX: true,
@@ -192,7 +203,7 @@ func UpdateOrderQtyWithRedis(c *fiber.Ctx) error {
 		Price:        body.Price,
 		Qty:          body.NewQty,
 		Side:         body.Side,
-		PurchaseFlag: body.PurchaseFlag,
+		PurchaseType: body.PurchaseType,
 	}
 	result, err := findMatchWithSet(&matchData)
 	if err != nil {

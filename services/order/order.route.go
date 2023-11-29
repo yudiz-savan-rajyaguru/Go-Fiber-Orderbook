@@ -8,6 +8,6 @@ import (
 func OrderRoute(route fiber.Router) {
 	routes := route.Group("/order")
 
-	routes.Post("", helper.BodyValidator(&RequestBody{}), MakeOrderWithRedis)
+	routes.Post("/buy", helper.BodyValidator(&RequestBody{}), MakeOrderWithRedis)
 	routes.Put("", helper.BodyValidator(&UpdateBody{}), UpdateOrderQtyWithRedis)
 }
